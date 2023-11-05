@@ -1,0 +1,51 @@
+// Импортируем необходимые библиотеки
+import android.app.Activity
+import android.os.Bundle
+import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
+import java.io.BufferedReader
+import java.io.FileReader
+
+// Создаем класс MainActivity, который наследует от Activity
+class MainActivity : Activity() {
+
+    // Объявляем переменные для элементов интерфейса
+    private lateinit var button: Button
+    private lateinit var textView: TextView
+
+    // Переопределяем метод onCreate, который вызывается при создании активности
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Устанавливаем макет для активности из файла activity_main.xml
+        setContentView(R.layout.activity_main)
+        // Инициализируем переменные с помощью метода findViewById
+        button = findViewById(R.id.button)
+        textView = findViewById(R.id.textView)
+        // Устанавливаем слушатель нажатия на кнопку
+        button.setOnClickListener {
+            // Пытаемся прочитать информацию о CPU из файла /proc/cpuinfo
+            try {
+                // Создаем объект BufferedReader для чтения файла построчно
+                val reader = BufferedReader(FileReader("/proc/cpuinfo"))
+                // Создаем строковый буфер для хранения информации
+                val buffer = StringBuffer()
+                // Читаем файл построчно, пока не достигнем конца
+                var line: String? = reader.readLine()
+                while (line != null) {
+                    // Добавляем прочитанную строку в буфер с переносом строки
+                    buffer.append(line + "\n")
+                    // Читаем следующую строку
+                    line = reader.readLine()
+                }
+                // Закрываем поток чтения
+                reader.close()
+                // Преобразуем буфер в строку и устанавливаем ее в textView
+                textView.text = buffer.toString()
+            } catch (e: Exception) {
+                // Если произошла ошибка, показываем всплывающее сообщение с текстом ошибки
+                Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+}
